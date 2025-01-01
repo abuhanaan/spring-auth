@@ -1,5 +1,7 @@
 package com.abuhanaan.spring_auth.config;
 
+import com.abuhanaan.spring_auth.filters.JwtAuthenticationFilter;
+import com.abuhanaan.spring_auth.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,7 +29,7 @@ public class SecurityConfig {
   private final PasswordEncoder passwordEncoder;
 
   @Bean
-  public AuthenticationProvider authenticationProvider(){
+  public AuthenticationProvider authenticationProvider() {
     DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
     authProvider.setUserDetailsService(userService.userDetailsService());
     authProvider.setPasswordEncoder(passwordEncoder);
@@ -43,13 +45,12 @@ public class SecurityConfig {
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
         .csrf(csrf -> csrf.disable())
-        .sessionManagement(session ->session
+        .sessionManagement(session -> session
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(authorize -> authorize
             .requestMatchers(HttpMethod.POST, "/api/v1/signup", "/api/v1/signin").permitAll()
             .requestMatchers(HttpMethod.GET, "/api/v1/test/**").permitAll()
-            .anyRequest().authenticated()
-        )
+            .anyRequest().authenticated())
         .authenticationProvider(authenticationProvider())
         .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
