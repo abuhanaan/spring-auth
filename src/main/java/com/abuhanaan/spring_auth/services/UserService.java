@@ -8,8 +8,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 import com.abuhanaan.spring_auth.exceptions.BadRequestException;
-// import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import com.abuhanaan.spring_auth.exceptions.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
