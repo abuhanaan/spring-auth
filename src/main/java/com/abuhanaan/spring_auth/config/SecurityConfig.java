@@ -1,8 +1,12 @@
 package com.abuhanaan.spring_auth.config;
 
+import com.abuhanaan.spring_auth.controllers.CustomAccessDeniedHandler;
+import com.abuhanaan.spring_auth.controllers.CustomAuthenticationEntryPoint;
 import com.abuhanaan.spring_auth.filters.JwtAuthenticationFilter;
 import com.abuhanaan.spring_auth.services.UserService;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -17,6 +21,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
 
 @Configuration
 @EnableWebSecurity
@@ -27,6 +32,8 @@ public class SecurityConfig {
   private final JwtAuthenticationFilter jwtAuthenticationFilter;
   private final UserService userService;
   private final PasswordEncoder passwordEncoder;
+  private final CustomAuthenticationEntryPoint authenticationEntryPoint;
+  private final CustomAccessDeniedHandler accessDeniedHandler;
 
   @Bean
   public AuthenticationProvider authenticationProvider() {
@@ -41,6 +48,26 @@ public class SecurityConfig {
     return config.getAuthenticationManager();
   }
 
+  // @Bean
+  // public SecurityFilterChain securityFilterChain(HttpSecurity http) throws
+  // Exception {
+  // http
+  // .csrf(csrf -> csrf.disable())
+  // .sessionManagement(session -> session
+  // .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+  // .authorizeHttpRequests(authorize -> authorize
+  // .requestMatchers(HttpMethod.POST, "/api/v1/signup",
+  // "/api/v1/signin")
+  // .permitAll()
+  // .requestMatchers(HttpMethod.GET, "/api/v1/test/**").permitAll()
+  // .anyRequest().authenticated())
+  // .authenticationProvider(authenticationProvider())
+  // .addFilterBefore(jwtAuthenticationFilter,
+  // UsernamePasswordAuthenticationFilter.class);
+
+  // return http.build();
+  // }
+
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
@@ -48,12 +75,19 @@ public class SecurityConfig {
         .sessionManagement(session -> session
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(authorize -> authorize
-            .requestMatchers(HttpMethod.POST, "/api/v1/signup", "/api/v1/signin").permitAll()
+            .requestMatchers(HttpMethod.POST, "/api/v1/signup",
+                "/api/v1/signin")
+            .permitAll()
             .requestMatchers(HttpMethod.GET, "/api/v1/test/**").permitAll()
             .anyRequest().authenticated())
+        .exceptionHandling(exception -> exception
+            .authenticationEntryPoint(authenticationEntryPoint)
+            .accessDeniedHandler(accessDeniedHandler))
         .authenticationProvider(authenticationProvider())
-        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        .addFilterBefore(jwtAuthenticationFilter,
+            UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
   }
+
 }

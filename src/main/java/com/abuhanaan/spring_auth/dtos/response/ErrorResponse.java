@@ -1,5 +1,7 @@
 package com.abuhanaan.spring_auth.dtos.response;
 
+import com.abuhanaan.spring_auth.models.ErrorCode;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,10 +10,12 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class JwtAuthenticationResponse extends ApiResponse {
+public class ErrorResponse extends ApiResponse {
 
-    private String token;
+    private Boolean status;
+    private ErrorCode error;
+    private String message;
 }

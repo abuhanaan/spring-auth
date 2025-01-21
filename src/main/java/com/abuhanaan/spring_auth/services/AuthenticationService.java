@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import com.abuhanaan.spring_auth.dtos.request.SignInRequest;
 import com.abuhanaan.spring_auth.dtos.request.SignUpRequest;
 import com.abuhanaan.spring_auth.dtos.response.JwtAuthenticationResponse;
+import com.abuhanaan.spring_auth.exceptions.AuthenticationException;
+import com.abuhanaan.spring_auth.exceptions.BadRequestException;
 import com.abuhanaan.spring_auth.models.Role;
 import com.abuhanaan.spring_auth.models.User;
 import com.abuhanaan.spring_auth.repositories.UserRepository;
@@ -40,10 +42,17 @@ public class AuthenticationService {
     }
 
     public JwtAuthenticationResponse signin(SignInRequest request) {
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new AuthenticationException(String.format("User with email %s does not exist",
+                        request.getEmail())));
+
+        if (!(passwordEncoder.matches(request.getPassword(), user.getPassword()))) {
+            System.out.println("Throwing Password Exception");
+            throw new BadRequestException("Invalid Password");
+        }
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
-        var user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid email or password."));
+
         var jwt = jwtService.generateToken(user);
         return JwtAuthenticationResponse.builder().token(jwt).build();
     }

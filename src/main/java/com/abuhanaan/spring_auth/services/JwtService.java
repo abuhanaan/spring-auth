@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+import com.abuhanaan.spring_auth.exceptions.AuthenticationException;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -35,6 +37,7 @@ public class JwtService {
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String userName = extractUserName(token);
+        System.out.println("Throwing token exception 0");
         return (userName.equals(userDetails.getUsername())) && !isTokenExpired(token);
     }
 
@@ -55,7 +58,13 @@ public class JwtService {
     }
 
     private boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
+        boolean tokenHasExpired = extractExpiration(token).before(new Date());
+        System.out.println("Throwing token exception1");
+        if (tokenHasExpired) {
+            System.out.println("Throwing token exception2");
+            throw new AuthenticationException("Token has expired");
+        }
+        return tokenHasExpired;
     }
 
     private Date extractExpiration(String token) {
