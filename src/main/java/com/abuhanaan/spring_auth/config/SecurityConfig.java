@@ -77,7 +77,9 @@ public class SecurityConfig {
             .requestMatchers(HttpMethod.POST, "/api/v1/signup",
                 "/api/v1/signin")
             .permitAll()
-            .requestMatchers(HttpMethod.GET, "/api/v1/test/**").permitAll()
+            .requestMatchers(HttpMethod.GET, "/api/v1/test/**", "/v3/api-docs/**", "/v3/api-docs",
+                "/swagger-ui/**", "/swagger-ui.html")
+            .permitAll()
             .anyRequest().authenticated())
         .exceptionHandling(exception -> exception
             .authenticationEntryPoint(authenticationEntryPoint)
